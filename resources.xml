@@ -1,0 +1,10 @@
+<gresources>
+  <gresource prefix="/yacc">
+    <file>flags/br.png</file>
+    <file>flags/us.png</file>
+    <file>flags/gb.png</file>
+    <file>flags/eu.png</file>
+    <file>flags/ca.png</file>
+    <file>style.css</file>
+  </gresource>
+</gresources>

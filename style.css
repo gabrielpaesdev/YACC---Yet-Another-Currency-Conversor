@@ -1,0 +1,29 @@
+* {
+    background-color: #171721;
+}
+
+window, dialog {
+    background-color: #171721;
+}
+
+entry, button, combobox box {
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 6px;
+}
+
+button {
+    background-color: #253447;
+    color: white;
+    border: none;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: #4CAF50;
+}
+
+label {
+    font-size: 20px;
+    color: #a6adc8;
+}
