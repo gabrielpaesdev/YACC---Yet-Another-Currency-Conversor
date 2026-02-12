@@ -20,11 +20,13 @@
 #include <string.h>
 #include <stdio.h>
 
+/* Widgets Globais */
 GtkWidget *entry_valor;
 GtkWidget *combo_de;
 GtkWidget *combo_para;
 GtkWidget *label_resultado;
 GtkWidget *switch_lang;
+GtkWidget *btn_converter; /* Promovido a global para poder mudar o texto */
 
 GtkListStore *store_pt;
 GtkListStore *store_en;
@@ -155,7 +157,8 @@ void converter(GtkButton *button, gpointer data) {
     double r_para = get_rate(para);
 
     if (r_de == 0 || r_para == 0) {
-        gtk_label_set_text(GTK_LABEL(label_resultado), "Taxas não carregadas");
+        gtk_label_set_text(GTK_LABEL(label_resultado), 
+            idioma ? "Rates not loaded" : "Taxas não carregadas");
         return;
     }
 
@@ -169,11 +172,22 @@ void converter(GtkButton *button, gpointer data) {
 gboolean trocar_idioma(GtkSwitch *sw, gboolean state, gpointer data) {
     idioma = state;
 
+    /* Atualiza as listas dos comboboxes */
     gtk_combo_box_set_model(GTK_COMBO_BOX(combo_de),
         idioma ? GTK_TREE_MODEL(store_en) : GTK_TREE_MODEL(store_pt));
     gtk_combo_box_set_model(GTK_COMBO_BOX(combo_para),
         idioma ? GTK_TREE_MODEL(store_en) : GTK_TREE_MODEL(store_pt));
 
+    /* Atualiza os textos estáticos */
+    if (idioma) {
+        gtk_entry_set_placeholder_text(GTK_ENTRY(entry_valor), "Amount");
+        gtk_button_set_label(GTK_BUTTON(btn_converter), "Convert");
+    } else {
+        gtk_entry_set_placeholder_text(GTK_ENTRY(entry_valor), "Valor");
+        gtk_button_set_label(GTK_BUTTON(btn_converter), "Converter");
+    }
+
+    /* Reseta a seleção */
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_de), 1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_para), 0);
 
@@ -235,17 +249,19 @@ int main(int argc, char *argv[]) {
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_de), 1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_para), 0);
 
-    GtkWidget *btn = gtk_button_new_with_label("Converter");
+
+    btn_converter = gtk_button_new_with_label("Converter");
+    
     label_resultado = gtk_label_new("---");
 
-    GtkWidget *label_creditos = gtk_label_new("Copyright © 2026 Gabriel Paes — v1.0.0");
+    GtkWidget *label_creditos = gtk_label_new("Copyright © 2026 Gabriel Paes — v1.0.1");
     gtk_widget_set_halign(label_creditos, GTK_ALIGN_END);
 
     gtk_box_pack_start(GTK_BOX(box), lang_box, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(box), entry_valor, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(box), combo_de, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(box), combo_para, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box), btn, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(box), btn_converter, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(box), label_resultado, FALSE, FALSE, 0);
     gtk_box_pack_end(GTK_BOX(box), label_creditos, FALSE, FALSE, 0);
 
@@ -255,7 +271,8 @@ int main(int argc, char *argv[]) {
         GTK_STYLE_PROVIDER(css),
         GTK_STYLE_PROVIDER_PRIORITY_USER);
 
-    g_signal_connect(btn, "clicked", G_CALLBACK(converter), NULL);
+    /* Conexão de sinais atualizada para usar btn_converter */
+    g_signal_connect(btn_converter, "clicked", G_CALLBACK(converter), NULL);
     g_signal_connect(switch_lang, "state-set", G_CALLBACK(trocar_idioma), NULL);
     g_signal_connect(win, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
@@ -263,4 +280,3 @@ int main(int argc, char *argv[]) {
     gtk_main();
     return 0;
 }
-
